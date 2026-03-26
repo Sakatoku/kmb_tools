@@ -3,6 +3,27 @@
 # Moves files from the source directory to /mnt/tmp/forward-{random8} and
 # transfers them via SCP to a remote server. Designed to run every 5 minutes
 # via cron. Files are moved first to prevent duplicate processing.
+#
+# Usage:
+#   forward_files.sh [--dry-run]
+#
+#   --dry-run  Show what would be done without moving files or running SCP.
+
+# ============================================================
+# Options
+# ============================================================
+
+DRY_RUN=0
+for ARG in "$@"; do
+    case "${ARG}" in
+        --dry-run) DRY_RUN=1 ;;
+        *)
+            echo "Unknown option: ${ARG}" >&2
+            echo "Usage: $0 [--dry-run]" >&2
+            exit 1
+            ;;
+    esac
+done
 
 # ============================================================
 # Configuration
@@ -43,7 +64,7 @@ log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') [$$] $*" >> "${LOG_FILE}"
 }
 
-log "=== START staging_dir=${STAGING_DIR} ==="
+log "=== START staging_dir=${STAGING_DIR} dry_run=${DRY_RUN} ==="
 
 # ============================================================
 # Check for target files
@@ -59,6 +80,18 @@ if [ "${FILE_COUNT}" -eq 0 ]; then
 fi
 
 log "Files found: ${FILE_COUNT}"
+
+# In dry-run mode, list target files and exit without touching anything
+if [ "${DRY_RUN}" -eq 1 ]; then
+    log "[DRY-RUN] Would create staging directory: ${STAGING_DIR}"
+    find "${SOURCE_DIR}" -maxdepth 1 -name "${FILE_PATTERN}" -type f 2>/dev/null | while read -r FILE_PATH; do
+        FILE_NAME=$(basename "${FILE_PATH}")
+        log "[DRY-RUN] Would move: ${FILE_PATH} -> ${STAGING_DIR}/${FILE_NAME}"
+    done
+    log "[DRY-RUN] Would transfer to: ${SCP_USER}@${SCP_HOST}:${SCP_DEST_DIR}"
+    log "=== END (dry-run) ==="
+    exit 0
+fi
 
 # ============================================================
 # Create staging directory and move files

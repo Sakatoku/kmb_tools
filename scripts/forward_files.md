@@ -6,6 +6,16 @@
 
 転送対象ファイルは処理の冒頭でステージングディレクトリへ移動してから転送を行う設計となっており、転送に5分以上要した場合でも次回の cron 実行と処理が重複しない。
 
+### 実行方法
+
+```sh
+# 通常実行
+forward_files.sh
+
+# ドライランモード（ファイル移動・SCP は一切行わない）
+forward_files.sh --dry-run
+```
+
 ---
 
 ## 基本設計書
@@ -33,7 +43,7 @@
 | 項目 | 内容 |
 |---|---|
 | 実行シェル | `/bin/sh`（POSIX 準拠） |
-| 実行方式 | cron（5分間隔） |
+| 実行方式 | cron（5分間隔）。`--dry-run` オプションで手動確認も可能 |
 | 必要コマンド | `scp`, `find`, `mv`, `rm`, `mkdir`, `tr`, `fold`, `cat`, `basename`, `date` |
 
 ### 3. 設定パラメータ
@@ -141,6 +151,19 @@
 | `WARNING:` | 注意が必要だが処理は継続 |
 | `ERROR:` | 処理が失敗または中断 |
 | `FAILED_FILE:` | SCP 転送失敗ファイルのファイル名 |
+
+#### ログ出力例（ドライラン時）
+
+```
+2026-03-26 05:32:00 [12345] === START staging_dir=/mnt/tmp/forward-a3f8k2qz dry_run=1 ===
+2026-03-26 05:32:00 [12345] Files found: 3
+2026-03-26 05:32:00 [12345] [DRY-RUN] Would create staging directory: /mnt/tmp/forward-a3f8k2qz
+2026-03-26 05:32:00 [12345] [DRY-RUN] Would move: /var/data/source/data_01.csv -> /mnt/tmp/forward-a3f8k2qz/data_01.csv
+2026-03-26 05:32:00 [12345] [DRY-RUN] Would move: /var/data/source/data_02.csv -> /mnt/tmp/forward-a3f8k2qz/data_02.csv
+2026-03-26 05:32:00 [12345] [DRY-RUN] Would move: /var/data/source/data_03.csv -> /mnt/tmp/forward-a3f8k2qz/data_03.csv
+2026-03-26 05:32:00 [12345] [DRY-RUN] Would transfer to: transfer@192.168.1.100:/data/incoming
+2026-03-26 05:32:00 [12345] === END (dry-run) ===
+```
 
 #### ログ出力例（正常時）
 
