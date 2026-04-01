@@ -1,0 +1,11 @@
+backlog:
+  space_id: "your-space"       # Backlog スペースID（例: https://your-space.backlog.com の "your-space"）
+  api_key: "your-api-key"      # Backlog API キー
+  project_key: "YOUR_PROJECT"  # 対象プロジェクトのキー
+  hours: 24                    # この時間（時）以内に更新されたチケットを対象にする
+
+email:
+  from: "sender@example.com"
+  to: "recipient@example.com"
+  subject: "Backlog 更新チケット通知"
+  output_dir: "./output"       # 生成する .eml ファイルの出力ディレクトリ
