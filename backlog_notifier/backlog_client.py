@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 class BacklogClient:
     """Backlog API v2 の薄いラッパー。"""
 
-    def __init__(self, space_id: str, api_key: str) -> None:
-        self._base_url = f"https://{space_id}.backlog.com/api/v2"
+    def __init__(self, space_id: str, api_key: str, base_url: str | None = None) -> None:
+        self._base_url = base_url or f"https://{space_id}.backlog.com/api/v2"
         self._api_key = api_key
         self._session = requests.Session()
         self._session.params = {"apiKey": api_key}  # type: ignore[assignment]

@@ -65,7 +65,12 @@ def main(argv: list[str] | None = None) -> None:
         "チケット取得開始 — プロジェクト: %s、対象: 直近 %d 時間", project_key, hours
     )
 
-    client = BacklogClient(space_id=space_id, api_key=api_key)
+    # client = BacklogClient(space_id=space_id, api_key=api_key)
+    client = BacklogClient(
+        space_id="dummy",
+        api_key="dummy",
+        base_url="http://localhost:8080/api/v2",
+    )
 
     try:
         issues = client.get_recently_updated_issues(
